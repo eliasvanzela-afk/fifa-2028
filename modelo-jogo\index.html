@@ -1,48 +1,105 @@
-<!doctype html>
-<html lang="pt-BR" data-theme="light">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
-    <title>Modelo de Jogo — Jogos VR</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="app">
-      <header class="top">
-        <div>
-          <span class="kicker">Modelo</span>
-          <h1 id="title">Clique no Alvo</h1>
-          <p class="subtitle">Troque este jogo pelo seu. O contrato já está pronto.</p>
-        </div>
-        <button id="restart" class="btn" type="button">Reiniciar</button>
-      </header>
-
-      <main>
-        <div class="hud">
-          <span class="pill">Alvos: <strong id="score">0</strong>/<span id="total">10</span></span>
-          <span class="pill">Tempo: <strong id="timer">0,0s</strong></span>
-        </div>
-
-        <div id="board" class="board" aria-label="Área do jogo">
-          <p id="start-hint" class="start-hint">Clique no alvo para começar</p>
-        </div>
-      </main>
-
-      <footer class="bottom">
-        <p>Este é o arquivo <code>game.js</code>. Leia os comentários e adapte.</p>
-      </footer>
-    </div>
-
-    <div id="result" class="overlay" hidden>
-      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="result-title">
-        <div class="modal-icon" aria-hidden="true">🎯</div>
-        <h2 id="result-title">Muito bem!</h2>
-        <p id="result-text">Você concluiu o jogo.</p>
-        <button id="play-again" class="btn btn-primary full" type="button">Jogar de novo</button>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Copa dos Robôs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container-jogo" id="aplicativo">
+    <!-- Cabeçalho com título, fase e pontos -->
+    <header class="cabecalho">
+      <div class="titulo-area">
+        <h1>⚽ Copa dos Robôs</h1>
+        <p class="subtitulo">Programe o robô para driblar e marcar o gol!</p>
       </div>
-    </div>
+      <div class="placar-area">
+        <span class="etiqueta" id="texto-fase">Fase 1 de 10</span>
+        <span class="etiqueta" id="texto-pontos">Pontos: 0</span>
+        <button type="button" id="botao-tema" class="botao-secundario" aria-label="Alternar tema claro ou escuro">
+          🌓 Tema
+        </button>
+      </div>
+    </header>
 
-    <script src="game.js"></script>
-  </body>
+    <!-- Dica da fase atual -->
+    <section class="painel-dica" aria-live="polite">
+      <strong id="titulo-fase">Fase 1: Primeiro Passo</strong>
+      <p id="descricao-fase">Use os comandos abaixo para levar o robô com a bola até o gol.</p>
+    </section>
+
+    <!-- Área principal: Campo de futebol + Painel de programação -->
+    <section class="area-principal">
+      <!-- Campo quadriculado -->
+      <div class="moldura-campo">
+        <div id="campo-futebol" class="campo-futebol" role="grid" aria-label="Campo de futebol quadriculado"></div>
+        <div class="legenda-campo">
+          <span>🤖 Seu Robô</span>
+          <span>⚽ Bola</span>
+          <span>🛡️ Zagueiro</span>
+          <span>🧤 Goleiro</span>
+          <span>🥅 Gol</span>
+        </div>
+      </div>
+
+      <!-- Painel de controle e algoritmo -->
+      <div class="painel-comandos">
+        <h2>1. Escolha os comandos</h2>
+        <div class="grade-botoes-comando">
+          <button type="button" class="botao-comando" data-comando="FRENTE">
+            ⬆️ Frente
+          </button>
+          <button type="button" class="botao-comando" data-comando="ESQUERDA">
+            ↩️ Virar Esq.
+          </button>
+          <button type="button" class="botao-comando" data-comando="DIREITA">
+            ↪️ Virar Dir.
+          </button>
+          <button type="button" class="botao-comando" data-comando="CHUTAR">
+            👟 Chutar
+          </button>
+        </div>
+
+        <div class="cabecalho-sequencia">
+          <h2>2. Seu Algoritmo (<span id="contador-comandos">0</span>/<span id="limite-comandos">6</span>)</h2>
+          <button type="button" id="botao-apagar-ultimo" class="botao-pequeno" title="Apagar último comando">
+            ⌫ Apagar
+          </button>
+        </div>
+
+        <div id="lista-sequencia" class="lista-sequencia" aria-label="Lista de comandos escolhidos">
+          <span class="texto-vazio">Clique nos botões acima para montar a sequência...</span>
+        </div>
+
+        <!-- Mensagem explicativa de acerto ou erro -->
+        <div id="caixa-feedback" class="caixa-feedback oculto" role="alert"></div>
+
+        <!-- Botões de ação -->
+        <div class="acoes-execucao">
+          <button type="button" id="botao-executar" class="botao-principal">
+            ▶️ Executar
+          </button>
+          <button type="button" id="botao-limpar" class="botao-secundario">
+            🔄 Reiniciar
+          </button>
+          <button type="button" id="botao-proxima" class="botao-sucesso oculto">
+            ➡️ Próxima Fase
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tela final de vitória -->
+    <section id="tela-final" class="tela-final oculto">
+      <h2>🏆 Campeão da Copa dos Robôs!</h2>
+      <p id="resumo-final">Você completou todas as 10 fases de lógica de programação!</p>
+      <button type="button" id="botao-jogar-novamente" class="botao-principal">
+        🔁 Jogar Novamente
+      </button>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
 </html>
